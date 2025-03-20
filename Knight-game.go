@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 
+//!!!add dungeon in forest, HP and DMG
+
 //Character interface that defines methods for all characters
 type Character interface {
 	Fight()
@@ -12,7 +14,7 @@ type Character interface {
 }
 
 type BaseCharacter struct {
-	Name string // !!!Add a name insert!!!
+	Name string
 }
 
 type Knight struct {
@@ -29,9 +31,15 @@ type Mage struct {
 	BaseCharacter
 }
 
+//Structure for Priest
+type Priest struct {
+	BaseCharacter
+}
+
 //Fight method
-func (c BaseCharacter) Fight() { //!!!Without asterisk!!!
+func (c *BaseCharacter) Fight() error {  //!!!Error handling!!!
 	fmt.Printf("%s fights\n", c.Name)
+	return nil
 }
 
 //Sleep method
@@ -50,8 +58,8 @@ func (c BaseCharacter) Eat() {
 }
 
 //Fight overridden method for Warrior
-func (w *Knight) Fight() {
-	fmt.Printf("%s (Knight) hit the enemy with a stick", w.Name)
+func (k *Knight) Fight() {
+	fmt.Printf("%s (Knight) hit the enemy with a stick", k.Name)
 }
 
 //Fight overridden method for Paladin
@@ -64,12 +72,20 @@ func (m *Mage) Fight() {
 	fmt.Printf("%s (Mage) cast a fireball", m.Name)
 }
 
+func (r *Priest) Fight() {
+	fmt.Printf("%s (Priest) use the holy hammer", r.Name)
+}
+
 //Choose location func
 func (c *BaseCharacter) ChooseLocation() {
 	var location string
-
-	fmt.Print("Where you want to go? (Forest/Town/Tavern)")
-	fmt.Scanln(&location)
+	
+	fmt.Print("Where do you want to go? (Forest/Town/Tavern)")          //!!!Fix error handling
+	//Error handling
+//	_, err := fmt.Scanln(&location)
+//	if err != nil {
+//		return fmt.Errorf("input error: %v", err)
+	}
 
 	switch location {
 	//case "Forbidden woods":
@@ -99,7 +115,24 @@ func (c BaseCharacter) GoToForest() {
 
 //Method for going to the town
 func (c BaseCharacter) GoToTown() {
-	fmt.Printf("%s goes to the Town...\n", c.Name) //!!!Create inn and tavern inside town, room for 1, 7, 30 nights
+	fmt.Printf("%s goes to the Town...\n", c.Name) //!!!Upgrade inn and tavern inside town, room for 1, 7, 30 nights, improve dungeon
+
+	//Choose a place to visit in town
+	var choosePlace string
+	fmt.Scan(&choosePlace)
+
+	fmt.Print("Where do you want to go? (dungeon/inn/tavern)")
+
+	switch choosePlace {
+	case "dungeon":
+		fmt.Printf("%s goes to the dungeon...", c.Name)
+	case "inn":
+		fmt.Println("%s goes to the Mermaid's inn...", c.Name)
+	case "tavern":
+		fmt.Println("%s goes to the Brick's tavern...", c.Name)
+	default:
+		fmt.Print("Unknown location. Choose from familiar places")
+	}
 
 	var action string
 	fmt.Scan(&action)
@@ -148,7 +181,7 @@ func StartGame() {
 	fmt.Print("Type name of your character: ")
 	fmt.Scanln(&name)
 	//Choose a class of character
-	fmt.Print("Choose class of your character: (knight/paladin/mage)")
+	fmt.Print("Choose class of your character: (knight/paladin/mage/priest)")
 	fmt.Scan(&characterClass)
 
 	var character Character
@@ -160,6 +193,8 @@ func StartGame() {
 		character = &Paladin{BaseCharacter{Name: name}}
 	case "mage":
 		character = &Mage{BaseCharacter{Name: name}}
+	case "priest":
+		character = &Priest{BaseCharacter{Name: name}}
 	default:
 		fmt.Println("Unknown class. Create knight by default")
 	}
