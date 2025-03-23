@@ -2,7 +2,14 @@ package main
 
 import "fmt"
 
-//!!!add dungeon in forest, HP and DMG
+//TODO:
+
+//!!!Upgrade inn and tavern inside town, room for 1, 7, 30 nights, improve dungeon for town
+//!!!add dungeon in forest, add HP and DMG system to this game
+//!!!Make Exit method from tavern for example
+//!!Make the choices more difficult, add different rooms, food and drinks for tavern
+//!!!Make fight method better, more interesting and work correctly
+//!!!Don't forget about error handling
 
 //Character interface that defines methods for all characters
 type Character interface {
@@ -37,9 +44,8 @@ type Priest struct {
 }
 
 //Fight method
-func (c *BaseCharacter) Fight() error { //!!!Error handling!!!
+func (c *BaseCharacter) Fight() {
 	fmt.Printf("%s fights\n", c.Name)
-	return nil
 }
 
 //Sleep method
@@ -49,12 +55,12 @@ func (c *BaseCharacter) Sleep() {
 
 //Drink method
 func (c *BaseCharacter) Drink() {
-	fmt.Printf("%s drink\n", c.Name)
+	fmt.Printf("%s drinks\n", c.Name)
 }
 
 //Eat method
 func (c *BaseCharacter) Eat() {
-	fmt.Printf("%s eat\n", c.Name)
+	fmt.Printf("%s eats food\n", c.Name)
 }
 
 //Fight overridden method for Warrior
@@ -88,15 +94,10 @@ func (c *BaseCharacter) ChooseLocation() {
 	}
 
 	switch location {
-	//case "Forbidden woods":
-	//fmt.Println("You are going to Forbidden woods")
 	case "forest":
 		c.GoToForest()
 	case "town":
-		//fmt.Println("You are going to Town")
 		c.GoToTown()
-	//case "Olaf's Tavern":
-	//	fmt.Println("You are going to Olaf's tavern")
 	case "tavern":
 		c.GoToTavern()
 	default:
@@ -105,17 +106,17 @@ func (c *BaseCharacter) ChooseLocation() {
 	}
 }
 
-//Method for going to the forest
+//Method for going to the forbidden forest
 func (c *BaseCharacter) GoToForest() {
 	fmt.Printf("%s goes to the Forbidden forest...\n", c.Name)
-	fmt.Print("The monster has attacked you! ")
+	fmt.Print("The monster has attacked you!\n")
 
-	c.Fight() //!!!Make fight method better and more interesting
+	c.Fight()
 }
 
 //Method for going to the town
 func (c *BaseCharacter) GoToTown() {
-	fmt.Printf("%s goes to the Town...\n", c.Name) //!!!Upgrade inn and tavern inside town, room for 1, 7, 30 nights, improve dungeon
+	fmt.Printf("%s goes to the Town...\n", c.Name)
 
 	//Choose a place to visit in town
 	var choosePlace string
@@ -125,16 +126,18 @@ func (c *BaseCharacter) GoToTown() {
 
 	switch choosePlace {
 	case "dungeon":
-		fmt.Printf("%s goes to the dungeon...", c.Name)
+		fmt.Printf("%s goes to the dungeon...\n", c.Name)
 
 	case "inn":
-		fmt.Printf("%s goes to the Mermaid's inn...", c.Name)
+		fmt.Printf("%s goes to the Mermaid's inn...\n", c.Name)
 	case "tavern":
-		fmt.Printf("%s goes to the Brick's tavern...", c.Name)
+		fmt.Printf("%s goes to the Brick's tavern...\n", c.Name)
 	default:
-		fmt.Print("Unknown location. Choose from familiar places")
+		fmt.Print("Unknown location. Choose from familiar places\n")
 	}
 
+	//!!! Maybe delete this
+	/*
 	var actionInside string
 	fmt.Scan(&actionInside)
 
@@ -146,17 +149,17 @@ func (c *BaseCharacter) GoToTown() {
 	case "sleep":
 		c.Sleep()
 	default:
-		fmt.Print("Unknown action. Please try again")
-	}
+		fmt.Print("Unknown action. Please try again\n")
+	}*/
 }
 
-//Method for going to the tavern
+//Method for going to the Olaf's tavern
 func (c *BaseCharacter) GoToTavern() {
-	fmt.Printf("%s goes to the Olaf's tavern...\n", c.Name) //!!Make the choices more difficult, add different rooms, food and drinks
+	fmt.Printf("%s goes to the Olaf's tavern...\n", c.Name)
 
 	var tavernAction string
 
-	fmt.Print("Olaf: Hey, traveler! Do you want to drink a cold beer or a room for a night?\n (Eat/Drink/Sleep)")  //!!!Try \n in thi place
+	fmt.Print("Olaf: Hey, traveler! Do you want to drink a cold beer or a room for a night? (Eat/Drink/Sleep)")
 
 	//Error handling
 	_, err := fmt.Scan(&tavernAction)
@@ -169,13 +172,13 @@ func (c *BaseCharacter) GoToTavern() {
 		fmt.Printf("Olaf: Here's your beer %s\n", c.Name)
 		c.Drink()
 	case "sleep":
-		fmt.Print("Olaf: your room is second on the right side of second floor")
+		fmt.Print("Olaf: your room is second on the right side of second floor\n")
 		c.Sleep()
 	case "eat":
-		fmt.Print("Waitress: Here's your food ")
+		fmt.Print("Waitress: Here's your food \n")
 		c.Eat()
 	default:
-		fmt.Print("Olaf: We don't offer this option")
+		fmt.Print("Olaf: We don't offer this option\n")
 	}
 }
 
