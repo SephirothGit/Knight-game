@@ -4,10 +4,9 @@ import "fmt"
 
 //TODO:
 
-//!!!Upgrade inn and tavern inside town, room for 1, 7, 30 nights, improve dungeon for town
-//!!!add dungeon in forest, add HP and DMG system to this game
+//!!!Add HP and DMG system to this game
 //!!!Make Exit method from tavern for example
-//!!Make the choices more difficult, add different rooms, food and drinks for tavern
+//!!Make the choices more difficult, add different rooms, food and drinks for tavern, action to the dungeon, inn, tavern
 //!!!Make fight method better, more interesting and work correctly
 //!!!Don't forget about error handling
 
@@ -121,13 +120,13 @@ func (c *BaseCharacter) GoToTown() {
 	//Choose a place to visit in town
 	var choosePlace string
 
-	fmt.Print("Where do you want to go? (dungeon/inn/tavern)")
+	fmt.Print("Which place you want to visit? (dungeon/inn/tavern)")
 	fmt.Scan(&choosePlace)
 
 	switch choosePlace {
 	case "dungeon":
-		fmt.Printf("%s goes to the dungeon...\n", c.Name)
-
+		//fmt.Printf("%s goes to the dungeon...\n", c.Name)
+		c.GoToDungeon()
 	case "inn":
 		fmt.Printf("%s goes to the Mermaid's inn...\n", c.Name)
 	case "tavern":
@@ -179,6 +178,66 @@ func (c *BaseCharacter) GoToTavern() {
 		c.Eat()
 	default:
 		fmt.Print("Olaf: We don't offer this option\n")
+	}
+}
+
+func(c *BaseCharacter) GoToDungeon() {
+	var dungeonAction string
+
+	fmt.Printf("%s went down into the dungeon...\n", c.Name)
+
+	fmt.Print("Choose floor: (first/second/third)")
+
+	_, err := fmt.Scan(&dungeonAction)
+	for err != nil {
+		fmt.Println("input error:", err)
+	}
+
+	switch dungeonAction {
+	case "first":
+		fmt.Printf("%s went down to the 1 floor of the Ancient Elven Dungeon\n", c.Name)
+	case "second":
+		fmt.Printf("%s went to the middle floor of the Ancient Elven Dungeon\n", c.Name)
+	case "third":
+		fmt.Printf("%s went to the lower floor of the Ancient Elven Dungeon\n", c.Name)
+	default:
+		fmt.Print("Unknown command. Choose from known floors\n")
+	}
+}
+
+func(c *BaseCharacter) GoToInn() {
+	fmt.Print("Welcome to the Freya's Inn!")
+
+	var innDuration string
+	var innAction string
+	fmt.Print("Freya: We offer best rooms in Fawn! For how long you want to stay in town? (1/7/30)")
+
+	_, err := fmt.Scan(&innDuration)
+	if err != nil {
+		fmt.Println("input error:", err)
+	}
+
+	//Choose for how long you want to stay in Fawn
+	switch innDuration {
+	case "1":
+		fmt.Print("Freya: It will cost you 1 silver coin\n")
+	case "7":
+		fmt.Print("Freya: It will cost you 7 silver coins\n")
+	case "30":
+		fmt.Print("Freya: Great choise! It will cost you only 27 silver coins!\n")
+	}
+
+	fmt.Printf("Freya: %s, do you want to drink or eat some delicious food?\n", c.Name)
+
+	_, err = fmt.Scan(&innAction)
+	if err != nil {
+		fmt.Println("input error:", err)
+	}
+	
+	switch innAction {
+	case "drink":
+	case "eat":
+	case "talk":
 	}
 }
 
