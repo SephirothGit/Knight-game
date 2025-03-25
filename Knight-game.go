@@ -4,11 +4,9 @@ import "fmt"
 
 //TODO:
 
-//!!!Add HP and DMG system to this game
+//!!!Add HP and DMG system to this game, make fight method better, more interesting and work correctly
 //!!!Make Exit method from tavern for example
 //!!Make the choices more difficult, add different rooms, food and drinks for tavern, action to the dungeon, inn, tavern
-//!!!Make fight method better, more interesting and work correctly
-//!!!Don't forget about error handling
 
 //Character interface that defines methods for all characters
 type Character interface {
@@ -100,7 +98,7 @@ func (c *BaseCharacter) ChooseLocation() {
 	case "tavern":
 		c.GoToTavern()
 	default:
-		fmt.Print("Unknown location. Use fast travel to a familiar place")
+		fmt.Print("Unknown location. Use fast travel to a familiar place\n")
 		c.ChooseLocation()
 	}
 }
@@ -121,14 +119,17 @@ func (c *BaseCharacter) GoToTown() {
 	var choosePlace string
 
 	fmt.Print("Which place you want to visit? (dungeon/inn/tavern)")
-	fmt.Scan(&choosePlace)
-
+	_, err := fmt.Scan(&choosePlace)
+	if err != nil {
+		fmt.Println("input error:", err)
+	}
 	switch choosePlace {
 	case "dungeon":
 		//fmt.Printf("%s goes to the dungeon...\n", c.Name)
 		c.GoToDungeon()
 	case "inn":
 		fmt.Printf("%s goes to the Mermaid's inn...\n", c.Name)
+		c.GoToInn()
 	case "tavern":
 		fmt.Printf("%s goes to the Brick's tavern...\n", c.Name)
 	default:
@@ -206,7 +207,7 @@ func(c *BaseCharacter) GoToDungeon() {
 }
 
 func(c *BaseCharacter) GoToInn() {
-	fmt.Print("Welcome to the Freya's Inn!")
+	fmt.Print("Welcome to the Mermaid's Inn!\n")
 
 	var innDuration string
 	var innAction string
@@ -221,13 +222,16 @@ func(c *BaseCharacter) GoToInn() {
 	switch innDuration {
 	case "1":
 		fmt.Print("Freya: It will cost you 1 silver coin\n")
+		fmt.Print("1 silver coin was given away\n")
 	case "7":
 		fmt.Print("Freya: It will cost you 7 silver coins\n")
+		fmt.Print("7 silver coins were given away\n")
 	case "30":
 		fmt.Print("Freya: Great choise! It will cost you only 27 silver coins!\n")
+		fmt.Print("30 silver coins were given away\n")
 	}
 
-	fmt.Printf("Freya: %s, do you want to drink or eat some delicious food?\n", c.Name)
+	fmt.Printf("Freya: %s, do you want to eat and drink, or maybe you want to hear rumors? \n", c.Name)
 
 	_, err = fmt.Scan(&innAction)
 	if err != nil {
@@ -236,8 +240,13 @@ func(c *BaseCharacter) GoToInn() {
 	
 	switch innAction {
 	case "drink":
+		c.Drink()
 	case "eat":
+		c.Eat()
 	case "talk":
+		fmt.Print("Freya: You want to hear the rumors, ok it will cost 2 silver coins")
+		fmt.Print("2 silver coins given away")
+		fmt.Print("Freya: Some strangers that were here two days ago asked travelers about man with a sword named Steel Rose. I heard that he stealed this item from the head of a royal guard of Shangri-La. A reward of 20 gold coins has been offered for the return of this sword. If you fast and smart enough to overtake those men, you can get this reward.")
 	}
 }
 
