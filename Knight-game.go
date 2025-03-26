@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 //TODO:
 
@@ -90,13 +93,16 @@ func (c *BaseCharacter) ChooseLocation() {
 		return
 	}
 
-	switch location {
+	switch strings.ToLower(location) {
 	case "forest":
 		c.GoToForest()
+		return
 	case "town":
 		c.GoToTown()
+		return
 	case "tavern":
 		c.GoToTavern()
+		return
 	default:
 		fmt.Print("Unknown location. Use fast travel to a familiar place\n")
 		c.ChooseLocation()
@@ -123,34 +129,21 @@ func (c *BaseCharacter) GoToTown() {
 	if err != nil {
 		fmt.Println("input error:", err)
 	}
-	switch choosePlace {
+	switch strings.ToLower(choosePlace) {
 	case "dungeon":
-		//fmt.Printf("%s goes to the dungeon...\n", c.Name)
 		c.GoToDungeon()
+		return
 	case "inn":
 		fmt.Printf("%s goes to the Mermaid's inn...\n", c.Name)
 		c.GoToInn()
+		return
 	case "tavern":
 		fmt.Printf("%s goes to the Brick's tavern...\n", c.Name)
+		c.GoToTavernB()
+		return
 	default:
 		fmt.Print("Unknown location. Choose from familiar places\n")
 	}
-
-	//!!! Maybe delete this
-	/*
-	var actionInside string
-	fmt.Scan(&actionInside)
-
-	fmt.Print("What do you want to do? (Drink/Sleep)")
-
-	switch actionInside {
-	case "drink":
-		c.Drink()
-	case "sleep":
-		c.Sleep()
-	default:
-		fmt.Print("Unknown action. Please try again\n")
-	}*/
 }
 
 //Method for going to the Olaf's tavern
@@ -167,7 +160,7 @@ func (c *BaseCharacter) GoToTavern() {
 		fmt.Println("input error:", err)
 	}
 
-	switch tavernAction {
+	switch strings.ToLower(tavernAction) {
 	case "drink":
 		fmt.Printf("Olaf: Here's your beer %s\n", c.Name)
 		c.Drink()
@@ -179,6 +172,29 @@ func (c *BaseCharacter) GoToTavern() {
 		c.Eat()
 	default:
 		fmt.Print("Olaf: We don't offer this option\n")
+	}
+}
+
+func(c *BaseCharacter) GoToTavernB() {
+	fmt.Printf("%s goes to the Brick's Tavern...\n", c.Name)
+
+	var tavernActionB string
+
+	fmt.Print("Brick: Good day, traveler! do you want to drink a glass of cold beer with a snacks? (Drink/Eat)")
+	_, err := fmt.Scan(&tavernActionB)
+	if err != nil {
+		fmt.Println("input err", err)
+	}
+
+	switch strings.ToLower(tavernActionB) {
+	case "drink":
+		fmt.Printf("Brick: here's your beer %s\n", c.Name)
+		c.Drink()
+	case "eat":
+		fmt.Printf("Brick: here's your snacks %s\n", c.Name)
+		c.Eat()
+	default:
+		fmt.Print("UNknown action. Choose from (Drink/Eat)\n")
 	}
 }
 
@@ -194,7 +210,7 @@ func(c *BaseCharacter) GoToDungeon() {
 		fmt.Println("input error:", err)
 	}
 
-	switch dungeonAction {
+	switch strings.ToLower(dungeonAction) {
 	case "first":
 		fmt.Printf("%s went down to the 1 floor of the Ancient Elven Dungeon\n", c.Name)
 	case "second":
@@ -219,7 +235,7 @@ func(c *BaseCharacter) GoToInn() {
 	}
 
 	//Choose for how long you want to stay in Fawn
-	switch innDuration {
+	switch strings.ToLower(innDuration) {
 	case "1":
 		fmt.Print("Freya: It will cost you 1 silver coin\n")
 		fmt.Print("1 silver coin was given away\n")
@@ -238,7 +254,7 @@ func(c *BaseCharacter) GoToInn() {
 		fmt.Println("input error:", err)
 	}
 	
-	switch innAction {
+	switch strings.ToLower(innAction) {
 	case "drink":
 		c.Drink()
 	case "eat":
@@ -271,7 +287,7 @@ func StartGame() {
 
 	var character Character
 
-	switch characterClass {
+	switch strings.ToLower(characterClass) {
 	case "knight":
 		character = &Knight{BaseCharacter{Name: name}}
 	case "paladin":
