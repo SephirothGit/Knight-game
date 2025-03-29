@@ -11,7 +11,7 @@ import (
 //!!!Make Exit method from tavern for example
 //!!Make the choices more difficult, add different rooms, food and drinks for tavern, action to the dungeon, inn, tavern
 
-//Character interface that defines methods for all characters
+// Character interface that defines methods for all characters
 type Character interface {
 	Fight()
 	Sleep()
@@ -28,52 +28,52 @@ type Knight struct {
 	BaseCharacter
 }
 
-//Structure for Paladin
+// Structure for Paladin
 type Paladin struct {
 	BaseCharacter
 }
 
-//Structure for Mage
+// Structure for Mage
 type Mage struct {
 	BaseCharacter
 }
 
-//Structure for Priest
+// Structure for Priest
 type Priest struct {
 	BaseCharacter
 }
 
-//Fight method
+// Fight method
 func (c *BaseCharacter) Fight() {
 	fmt.Printf("%s fights\n", c.Name)
 }
 
-//Sleep method
+// Sleep method
 func (c *BaseCharacter) Sleep() {
 	fmt.Printf("%s sleep\n", c.Name)
 }
 
-//Drink method
+// Drink method
 func (c *BaseCharacter) Drink() {
 	fmt.Printf("%s drinks\n", c.Name)
 }
 
-//Eat method
+// Eat method
 func (c *BaseCharacter) Eat() {
 	fmt.Printf("%s eats food\n", c.Name)
 }
 
-//Fight overridden method for Warrior
+// Fight overridden method for Warrior
 func (k *Knight) Fight() {
 	fmt.Printf("%s (Knight) hit the enemy with a stick\n", k.Name)
 }
 
-//Fight overridden method for Paladin
+// Fight overridden method for Paladin
 func (p *Paladin) Fight() {
 	fmt.Printf("%s (Paladin) hit the enemy with a holy sword\n", p.Name)
 }
 
-//Fight overridden method for Mage
+// Fight overridden method for Mage
 func (m *Mage) Fight() {
 	fmt.Printf("%s (Mage) cast a fireball\n", m.Name)
 }
@@ -82,7 +82,7 @@ func (r *Priest) Fight() {
 	fmt.Printf("%s (Priest) use the holy hammer\n", r.Name)
 }
 
-//Choose location func
+// Choose location func
 func (c *BaseCharacter) ChooseLocation() {
 	var location string
 
@@ -109,7 +109,7 @@ func (c *BaseCharacter) ChooseLocation() {
 	}
 }
 
-//Method for going to the forbidden forest
+// Method for going to the forbidden forest
 func (c *BaseCharacter) GoToForest() {
 	fmt.Printf("%s goes to the Forbidden forest...\n", c.Name)
 	fmt.Print("The monster has attacked you!\n")
@@ -117,7 +117,7 @@ func (c *BaseCharacter) GoToForest() {
 	c.Fight()
 }
 
-//Method for going to the town
+// Method for going to the town
 func (c *BaseCharacter) GoToTown() {
 	fmt.Printf("%s goes to the Town...\n", c.Name)
 
@@ -146,36 +146,43 @@ func (c *BaseCharacter) GoToTown() {
 	}
 }
 
-//Method for going to the Olaf's tavern
+// Method for going to the Olaf's tavern
 func (c *BaseCharacter) GoToTavern() {
 	fmt.Printf("%s goes to the Olaf's tavern...\n", c.Name)
 
-	var tavernAction string
+	//Loop for actions
+	for {
 
-	fmt.Print("Olaf: Hey, traveler! Do you want to drink a cold beer or a room for a night? (Eat/Drink/Sleep)")
+		var tavernAction string
 
-	//Error handling
-	_, err := fmt.Scan(&tavernAction)
-	if err != nil {
-		fmt.Println("input error:", err)
-	}
+		fmt.Print("Olaf: Hey, traveler! Do you want to drink a cold beer or a room for a night? (Eat/Drink/Sleep/Exit)")
 
-	switch strings.ToLower(tavernAction) {
-	case "drink":
-		fmt.Printf("Olaf: Here's your beer %s\n", c.Name)
-		c.Drink()
-	case "sleep":
-		fmt.Print("Olaf: your room is second on the right side of second floor\n")
-		c.Sleep()
-	case "eat":
-		fmt.Print("Waitress: Here's your food \n")
-		c.Eat()
-	default:
-		fmt.Print("Olaf: We don't offer this option\n")
+		//Error handling
+		_, err := fmt.Scan(&tavernAction)
+		if err != nil {
+			fmt.Println("input error:", err)
+		}
+
+		switch strings.ToLower(tavernAction) {
+		case "drink":
+			fmt.Printf("Olaf: Here's your beer %s\n", c.Name)
+			c.Drink()
+		case "sleep":
+			fmt.Print("Olaf: your room is second on the right side of second floor\n")
+			c.Sleep()
+		case "eat":
+			fmt.Print("Waitress: Here's your food \n")
+			c.Eat()
+		case "exit":
+			fmt.Print("Olaf: Goodbye, traveler!\n")
+			c.ChooseLocation()
+			return
+		default:
+			fmt.Print("Olaf: We don't offer this option\n")
+		}
 	}
 }
-
-func(c *BaseCharacter) GoToTavernB() {
+func (c *BaseCharacter) GoToTavernB() {
 	fmt.Printf("%s goes to the Brick's Tavern...\n", c.Name)
 
 	var tavernActionB string
@@ -198,7 +205,7 @@ func(c *BaseCharacter) GoToTavernB() {
 	}
 }
 
-func(c *BaseCharacter) GoToDungeon() {
+func (c *BaseCharacter) GoToDungeon() {
 	var dungeonAction string
 
 	fmt.Printf("%s went down into the dungeon...\n", c.Name)
@@ -222,7 +229,7 @@ func(c *BaseCharacter) GoToDungeon() {
 	}
 }
 
-func(c *BaseCharacter) GoToInn() {
+func (c *BaseCharacter) GoToInn() {
 	fmt.Print("Welcome to the Mermaid's Inn!\n")
 
 	var innDuration string
@@ -253,7 +260,7 @@ func(c *BaseCharacter) GoToInn() {
 	if err != nil {
 		fmt.Println("input error:", err)
 	}
-	
+
 	switch strings.ToLower(innAction) {
 	case "drink":
 		c.Drink()
