@@ -7,9 +7,8 @@ import (
 
 //TODO:
 
-//!!!Add HP and DMG system to this game, make fight method better, more interesting and work correctly
-//!!!Make Exit method from tavern for example
-//!!Make the choices more difficult, add different rooms, food and drinks for tavern, action to the dungeon, inn, tavern
+//!!!Improve HP and DMG system, make fight method better, more interesting and work correctly
+//!!!Add different rooms, food and drinks for tavern, action to the dungeon, inn, tavern
 
 // Character interface that defines methods for all characters
 type Character interface {
@@ -22,6 +21,9 @@ type Character interface {
 
 type BaseCharacter struct {
 	Name string
+	HP int
+	MaxHP int
+	DMG int
 }
 
 type Knight struct {
@@ -121,28 +123,34 @@ func (c *BaseCharacter) GoToForest() {
 func (c *BaseCharacter) GoToTown() {
 	fmt.Printf("%s goes to the Town...\n", c.Name)
 
-	//Choose a place to visit in town
-	var choosePlace string
+	for {
+		//Choose a place to visit in town
+		var choosePlace string
 
-	fmt.Print("Which place you want to visit? (dungeon/inn/tavern)")
-	_, err := fmt.Scan(&choosePlace)
-	if err != nil {
-		fmt.Println("input error:", err)
-	}
-	switch strings.ToLower(choosePlace) {
-	case "dungeon":
-		c.GoToDungeon()
-		return
-	case "inn":
-		fmt.Printf("%s goes to the Mermaid's inn...\n", c.Name)
-		c.GoToInn()
-		return
-	case "tavern":
-		fmt.Printf("%s goes to the Brick's tavern...\n", c.Name)
-		c.GoToTavernB()
-		return
-	default:
-		fmt.Print("Unknown location. Choose from familiar places\n")
+		fmt.Print("Which place you want to visit? (Dungeon/Inn/Tavern/Leave)")
+		_, err := fmt.Scan(&choosePlace)
+		if err != nil {
+			fmt.Println("input error:", err)
+		}
+		switch strings.ToLower(choosePlace) {
+		case "dungeon":
+			c.GoToDungeon()
+			return
+		case "inn":
+			fmt.Printf("%s goes to the Mermaid's inn...\n", c.Name)
+			c.GoToInn()
+			return
+		case "tavern":
+			fmt.Printf("%s goes to the Brick's tavern...\n", c.Name)
+			c.GoToTavernB()
+			return
+		case "leave":
+			fmt.Print("You came out\n")
+			c.ChooseLocation()
+			return
+		default:
+			fmt.Print("Unknown location. Choose from familiar places\n")
+		}
 	}
 }
 
@@ -182,53 +190,64 @@ func (c *BaseCharacter) GoToTavern() {
 		}
 	}
 }
+
 func (c *BaseCharacter) GoToTavernB() {
 	fmt.Printf("%s goes to the Brick's Tavern...\n", c.Name)
 
-	var tavernActionB string
+	for {
+		var tavernActionB string
 
-	fmt.Print("Brick: Good day, traveler! do you want to drink a glass of cold beer with a snacks? (Drink/Eat)")
-	_, err := fmt.Scan(&tavernActionB)
-	if err != nil {
-		fmt.Println("input err", err)
-	}
+		fmt.Print("Brick: Good day, traveler! do you want to drink a glass of cold beer with a snacks? (Drink/Eat/Exit)")
+		_, err := fmt.Scan(&tavernActionB)
+		if err != nil {
+			fmt.Println("input err", err)
+		}
 
-	switch strings.ToLower(tavernActionB) {
-	case "drink":
-		fmt.Printf("Brick: here's your beer %s\n", c.Name)
-		c.Drink()
-	case "eat":
-		fmt.Printf("Brick: here's your snacks %s\n", c.Name)
-		c.Eat()
-	default:
-		fmt.Print("UNknown action. Choose from (Drink/Eat)\n")
+		switch strings.ToLower(tavernActionB) {
+		case "drink":
+			fmt.Printf("Brick: here's your beer %s\n", c.Name)
+			c.Drink()
+		case "eat":
+			fmt.Printf("Brick: here's your snacks %s\n", c.Name)
+			c.Eat()
+		case "exit":
+			fmt.Print("Brick: come back anytime!\n")
+		default:
+			fmt.Print("UNknown action. Choose from (Drink/Eat/Exit)\n")
+		}
 	}
 }
 
 func (c *BaseCharacter) GoToDungeon() {
-	var dungeonAction string
 
-	fmt.Printf("%s went down into the dungeon...\n", c.Name)
+	for {
+		var dungeonAction string
 
-	fmt.Print("Choose floor: (first/second/third)")
+		fmt.Printf("%s went down into the dungeon...\n", c.Name)
 
-	_, err := fmt.Scan(&dungeonAction)
-	for err != nil {
-		fmt.Println("input error:", err)
-	}
+		fmt.Print("Choose floor: (First/Second/Third/Teleport)")
 
-	switch strings.ToLower(dungeonAction) {
-	case "first":
-		fmt.Printf("%s went down to the 1 floor of the Ancient Elven Dungeon\n", c.Name)
-	case "second":
-		fmt.Printf("%s went to the middle floor of the Ancient Elven Dungeon\n", c.Name)
-	case "third":
-		fmt.Printf("%s went to the lower floor of the Ancient Elven Dungeon\n", c.Name)
-	default:
-		fmt.Print("Unknown command. Choose from known floors\n")
+		_, err := fmt.Scan(&dungeonAction)
+		for err != nil {
+			fmt.Println("input error:", err)
+		}
+
+		switch strings.ToLower(dungeonAction) {
+		case "first":
+			fmt.Printf("%s went down to the 1 floor of the Ancient Elven Dungeon\n", c.Name)
+		case "second":
+			fmt.Printf("%s went to the middle floor of the Ancient Elven Dungeon\n", c.Name)
+		case "third":
+			fmt.Printf("%s went to the lower floor of the Ancient Elven Dungeon\n", c.Name)
+		case "teleport":
+			fmt.Print("Choose a place to teleport:\n")
+			c.ChooseLocation()
+			return
+		default:
+			fmt.Print("Unknown command. Choose from known floors\n")
+		}
 	}
 }
-
 func (c *BaseCharacter) GoToInn() {
 	fmt.Print("Welcome to the Mermaid's Inn!\n")
 
@@ -254,22 +273,28 @@ func (c *BaseCharacter) GoToInn() {
 		fmt.Print("30 silver coins were given away\n")
 	}
 
-	fmt.Printf("Freya: %s, do you want to eat and drink, or maybe you want to hear rumors? \n", c.Name)
+	for {
+		fmt.Printf("Freya: %s, do you want to eat and drink, or maybe you want to hear rumors? (Drink/Eat/Rumors/Exit)", c.Name)
 
-	_, err = fmt.Scan(&innAction)
-	if err != nil {
-		fmt.Println("input error:", err)
-	}
+		_, err = fmt.Scan(&innAction)
+		if err != nil {
+			fmt.Println("input error:", err)
+		}
 
-	switch strings.ToLower(innAction) {
-	case "drink":
-		c.Drink()
-	case "eat":
-		c.Eat()
-	case "talk":
-		fmt.Print("Freya: You want to hear the rumors, ok it will cost 2 silver coins")
-		fmt.Print("2 silver coins given away")
-		fmt.Print("Freya: Some strangers that were here two days ago asked travelers about man with a sword named Steel Rose. I heard that he stealed this item from the head of a royal guard of Shangri-La. A reward of 20 gold coins has been offered for the return of this sword. If you fast and smart enough to overtake those men, you can get this reward.")
+		switch strings.ToLower(innAction) {
+		case "drink":
+			c.Drink()
+		case "eat":
+			c.Eat()
+		case "rumors":
+			fmt.Print("Freya: You want to hear the rumors, ok it will cost 2 silver coins\n")
+			fmt.Print("2 silver coins given away\n")
+			fmt.Print("Freya: Some strangers that were here two days ago asked travelers about man with a sword named Steel Rose. I heard that he stealed this item from the head of a royal guard of Shangri-La. A reward of 20 gold coins has been offered for the return of this sword. If you fast and smart enough to overtake those men, you can get this reward.\n")
+		case "exit":
+			fmt.Print("Freya: come back whenever you want to stay in town, traveler!\n")
+			c.ChooseLocation()
+			return
+		}
 	}
 }
 
@@ -277,7 +302,7 @@ func StartGame() {
 	var name, characterClass string
 
 	//Type a name of your character
-	fmt.Print("Type name of your character: ")
+	fmt.Print("Give a name for your character: ")
 	_, err := fmt.Scanln(&name)
 	if err != nil {
 		fmt.Println("input error:", err)
@@ -285,7 +310,7 @@ func StartGame() {
 	}
 
 	//Choose a class of character
-	fmt.Print("Choose class of your character: (knight/paladin/mage/priest)")
+	fmt.Print("Choose class of your character: (Knight/Paladin/Mage/Priest)")
 	_, err = fmt.Scan(&characterClass)
 	if err != nil {
 		fmt.Println("input error:", err)
@@ -296,16 +321,16 @@ func StartGame() {
 
 	switch strings.ToLower(characterClass) {
 	case "knight":
-		character = &Knight{BaseCharacter{Name: name}}
+		character = &Knight{BaseCharacter{Name: name, HP: 180, MaxHP: 180, DMG: 20}}
 	case "paladin":
-		character = &Paladin{BaseCharacter{Name: name}}
+		character = &Paladin{BaseCharacter{Name: name, HP: 220, MaxHP: 220, DMG: 24}}
 	case "mage":
-		character = &Mage{BaseCharacter{Name: name}}
+		character = &Mage{BaseCharacter{Name: name, HP: 120, MaxHP: 120, DMG: 36}}
 	case "priest":
-		character = &Priest{BaseCharacter{Name: name}}
+		character = &Priest{BaseCharacter{Name: name, HP: 80, MaxHP: 80, DMG: 8}}
 	default:
-		fmt.Println("Unknown class. Create knight by default")
-		character = &Knight{BaseCharacter{Name: name}}
+		fmt.Println("Unknown class. Create Knight by default")
+		character = &Knight{BaseCharacter{Name: name, HP: 180, MaxHP: 180, DMG: 20}}
 	}
 	character.ChooseLocation()
 }
