@@ -7,7 +7,9 @@ import (
 
 //TODO:
 
-//!!!Improve HP and DMG system, make fight method better, more interesting and work correctly
+//!!!Fix loop in Mermaid's inn
+//!!!Make more fights
+//!!!Make fight method more interesting
 //!!!Add different rooms, food and drinks for tavern, action to the dungeon, inn, tavern
 
 // Character interface that defines methods for all characters
@@ -20,10 +22,12 @@ type Character interface {
 }
 
 type BaseCharacter struct {
-	Name string
-	HP int
-	MaxHP int
-	DMG int
+	Name   string
+	HP     int
+	MaxHP  int
+	DMG    int
+	Gold   int
+	Silver int
 }
 
 type Knight struct {
@@ -50,73 +54,128 @@ func (c *BaseCharacter) Fight() {
 	fmt.Printf("%s fights\n", c.Name)
 }
 
-// Sleep method
+// Sleep and restore full HP method
 func (c *BaseCharacter) Sleep() {
-	fmt.Printf("%s sleep\n", c.Name)
+	c.HP = c.MaxHP
+	fmt.Printf("%s sleep and restores full HP %d/%d\n", c.Name, c.HP, c.MaxHP)
 }
 
 // Drink method
 func (c *BaseCharacter) Drink() {
-	fmt.Printf("%s drinks\n", c.Name)
+	if c.Silver >= 1 {
+		c.Silver -= 1
+		fmt.Printf("%s drinks a beer (-1 silver coin)\n", c.Name)
+	} else {
+		fmt.Println("Not enough silver!")
+	}
 }
 
 // Eat method
 func (c *BaseCharacter) Eat() {
-	fmt.Printf("%s eats food\n", c.Name)
+	if c.Silver >= 2 {
+		c.Silver -= 2
+		c.HP += 50
+
+		if c.HP > c.MaxHP {
+			c.HP = c.MaxHP
+		}
+		fmt.Printf("%s eats food and restores 50 HP (-2 silver coin)\n", c.Name)
+	} else {
+		fmt.Println("Not enough silver")
+	}
 }
 
 // Fight overridden method for Warrior
 func (k *Knight) Fight() {
-	fmt.Printf("%s (Knight) hit the enemy with a stick\n", k.Name)
+	fmt.Printf("%s (Knight) hit the enemy with a stick for %d DMG\n", k.Name, k.DMG)
 }
 
 // Fight overridden method for Paladin
 func (p *Paladin) Fight() {
-	fmt.Printf("%s (Paladin) hit the enemy with a holy sword\n", p.Name)
+	fmt.Printf("%s (Paladin) hit the enemy with a holy sword for %d DMG\n", p.Name, p.DMG)
 }
 
 // Fight overridden method for Mage
 func (m *Mage) Fight() {
-	fmt.Printf("%s (Mage) cast a fireball\n", m.Name)
+	fmt.Printf("%s (Mage) cast a fireball for %d DMG\n", m.Name, m.DMG)
 }
 
 func (r *Priest) Fight() {
-	fmt.Printf("%s (Priest) use the holy hammer\n", r.Name)
+	fmt.Printf("%s (Priest) use the holy hammer for %d DMG\n", r.Name, r.DMG)
 }
 
 // Choose location func
 func (c *BaseCharacter) ChooseLocation() {
-	var location string
+	for {
+		var location string
 
-	fmt.Print("Where do you want to go? (Forest/Town/Tavern)")
-	_, err := fmt.Scan(&location)
-	if err != nil {
-		fmt.Println("input error", err)
-		return
-	}
+		fmt.Print("Where do you want to go? (Forest/Town/Tavern/Exit)")
+		_, err := fmt.Scan(&location)
+		if err != nil {
+			fmt.Println("input error", err)
+			return
+		}
 
-	switch strings.ToLower(location) {
-	case "forest":
-		c.GoToForest()
-		return
-	case "town":
-		c.GoToTown()
-		return
-	case "tavern":
-		c.GoToTavern()
-		return
-	default:
-		fmt.Print("Unknown location. Use fast travel to a familiar place\n")
-		c.ChooseLocation()
+		switch strings.ToLower(location) {
+		case "forest":
+			c.GoToForest()
+			return
+		case "town":
+			c.GoToTown()
+			return
+		case "tavern":
+			c.GoToTavern()
+			return
+		case "exit":
+			fmt.Print("Goodbye")
+			return
+		default:
+			fmt.Print("Unknown location. Use fast travel to a familiar place\n")
+			c.ChooseLocation()
+		}
 	}
 }
 
 // Method for going to the forbidden forest
 func (c *BaseCharacter) GoToForest() {
 	fmt.Printf("%s goes to the Forbidden forest...\n", c.Name)
-	fmt.Print("The monster has attacked you!\n")
 
-	c.Fight()
+	//Improved fight system
+	enemyHP := 50
+	fmt.Printf("A monster (HP: %d) has attacked you!\n", enemyHP)
+
+	for {
+		fmt.Printf("%s HP: %d/%d | Monster HP %d\n", c.Name, c.HP, c.MaxHP, enemyHP)
+		fmt.Print("What will you do? (Fight/Run)")
+
+		var action string
+		fmt.Scan(&action)
+
+		switch strings.ToLower(action) {
+		case "fight":
+			fmt.Printf("%s atacks the monster!\n", c.Name)
+			enemyHP -= c.DMG
+
+			if enemyHP <= 0 {
+				fmt.Println("You defeated the monster!\n")
+				return
+			}
+			//Monster fights
+			monsterDMG := 10
+			c.MaxHP -= monsterDMG
+			fmt.Printf("Monster hits you for %d damage!\n", monsterDMG)
+
+			if c.HP <= 0 {
+				fmt.Println("You died")
+				return
+			}
+		case "run":
+			fmt.Print("You run away from the monster!")
+			return
+		default:
+			fmt.Print("Unknown command")
+		}
+	}
 }
 
 // Method for going to the town
@@ -127,7 +186,7 @@ func (c *BaseCharacter) GoToTown() {
 		//Choose a place to visit in town
 		var choosePlace string
 
-		fmt.Print("Which place you want to visit? (Dungeon/Inn/Tavern/Leave)")
+		fmt.Print("Which place you want to visit? (Dungeon/Inn/Tavern/Exit)")
 		_, err := fmt.Scan(&choosePlace)
 		if err != nil {
 			fmt.Println("input error:", err)
@@ -144,7 +203,7 @@ func (c *BaseCharacter) GoToTown() {
 			fmt.Printf("%s goes to the Brick's tavern...\n", c.Name)
 			c.GoToTavernB()
 			return
-		case "leave":
+		case "exit":
 			fmt.Print("You came out\n")
 			c.ChooseLocation()
 			return
@@ -251,6 +310,7 @@ func (c *BaseCharacter) GoToDungeon() {
 func (c *BaseCharacter) GoToInn() {
 	fmt.Print("Welcome to the Mermaid's Inn!\n")
 
+	for {
 	var innDuration string
 	var innAction string
 	fmt.Print("Freya: We offer best rooms in Fawn! For how long you want to stay in town? (1/7/30)")
@@ -258,42 +318,69 @@ func (c *BaseCharacter) GoToInn() {
 	_, err := fmt.Scan(&innDuration)
 	if err != nil {
 		fmt.Println("input error:", err)
+		continue
 	}
 
 	//Choose for how long you want to stay in Fawn
 	switch strings.ToLower(innDuration) {
 	case "1":
 		fmt.Print("Freya: It will cost you 1 silver coin\n")
-		fmt.Print("1 silver coin was given away\n")
-	case "7":
-		fmt.Print("Freya: It will cost you 7 silver coins\n")
-		fmt.Print("7 silver coins were given away\n")
-	case "30":
-		fmt.Print("Freya: Great choise! It will cost you only 27 silver coins!\n")
-		fmt.Print("30 silver coins were given away\n")
-	}
 
-	for {
-		fmt.Printf("Freya: %s, do you want to eat and drink, or maybe you want to hear rumors? (Drink/Eat/Rumors/Exit)", c.Name)
-
-		_, err = fmt.Scan(&innAction)
-		if err != nil {
-			fmt.Println("input error:", err)
+		if c.Silver >= 1 {
+			c.Silver -= 1
+			fmt.Print("1 silver coin was given away\n")
+			c.Sleep()
+		} else {
+			fmt.Println("Not enough silver")
 		}
 
-		switch strings.ToLower(innAction) {
-		case "drink":
-			c.Drink()
-		case "eat":
-			c.Eat()
-		case "rumors":
-			fmt.Print("Freya: You want to hear the rumors, ok it will cost 2 silver coins\n")
-			fmt.Print("2 silver coins given away\n")
-			fmt.Print("Freya: Some strangers that were here two days ago asked travelers about man with a sword named Steel Rose. I heard that he stealed this item from the head of a royal guard of Shangri-La. A reward of 20 gold coins has been offered for the return of this sword. If you fast and smart enough to overtake those men, you can get this reward.\n")
-		case "exit":
-			fmt.Print("Freya: come back whenever you want to stay in town, traveler!\n")
-			c.ChooseLocation()
-			return
+	case "7":
+		fmt.Print("Freya: It will cost you 7 silver coins\n")
+
+		if c.Silver >= 7 {
+			c.Silver -= 7
+			fmt.Print("7 silver coins were given away\n")
+			c.Sleep()
+		} else {
+			fmt.Println("Not enough silver")
+		}
+	case "30":
+		fmt.Print("Freya: Great choise! It will cost you only 27 silver coins!\n")
+
+		if c.Silver >= 27 {
+			c.Silver -= 27
+			fmt.Print("27 silver coins were given away\n")
+			c.Sleep()
+		} else {
+			fmt.Println("Not enough silver!")
+		}
+
+		for {
+			fmt.Printf("Freya: %s, do you want to eat and drink, or maybe you want to hear rumors? (Drink/Eat/Rumors/Exit)", c.Name)
+
+			_, err = fmt.Scan(&innAction)
+			if err != nil {
+				fmt.Println("input error:", err)
+			}
+
+			switch strings.ToLower(innAction) {
+			case "drink":
+				c.Drink()
+			case "eat":
+				c.Eat()
+			case "rumors":
+				fmt.Print("Freya: You want to hear the rumors, ok it will cost 2 silver coins\n")
+
+				if c.Silver >= 2 {
+					c.Silver -= 2
+					fmt.Print("2 silver coins were given away\n")
+				}
+				fmt.Print("Freya: Some strangers that were here two days ago asked travelers about man with a sword named Steel Rose. I heard that he stealed this item from the head of a royal guard of Shangri-La. A reward of 20 gold coins has been offered for the return of this sword. If you fast and smart enough to overtake those men, you can get this reward.\n")
+			case "exit":
+				fmt.Print("Freya: come back whenever you want to stay in town, traveler!\n")
+				c.ChooseLocation()
+				return
+			}
 		}
 	}
 }
@@ -321,16 +408,16 @@ func StartGame() {
 
 	switch strings.ToLower(characterClass) {
 	case "knight":
-		character = &Knight{BaseCharacter{Name: name, HP: 180, MaxHP: 180, DMG: 20}}
+		character = &Knight{BaseCharacter{Name: name, HP: 180, MaxHP: 180, DMG: 20, Gold: 10, Silver: 120}}
 	case "paladin":
-		character = &Paladin{BaseCharacter{Name: name, HP: 220, MaxHP: 220, DMG: 24}}
+		character = &Paladin{BaseCharacter{Name: name, HP: 220, MaxHP: 220, DMG: 24, Gold: 13, Silver: 146}}
 	case "mage":
-		character = &Mage{BaseCharacter{Name: name, HP: 120, MaxHP: 120, DMG: 36}}
+		character = &Mage{BaseCharacter{Name: name, HP: 120, MaxHP: 120, DMG: 36, Gold: 34, Silver: 293}}
 	case "priest":
-		character = &Priest{BaseCharacter{Name: name, HP: 80, MaxHP: 80, DMG: 8}}
+		character = &Priest{BaseCharacter{Name: name, HP: 80, MaxHP: 80, DMG: 8, Gold: 2, Silver: 91}}
 	default:
 		fmt.Println("Unknown class. Create Knight by default")
-		character = &Knight{BaseCharacter{Name: name, HP: 180, MaxHP: 180, DMG: 20}}
+		character = &Knight{BaseCharacter{Name: name, HP: 180, MaxHP: 180, DMG: 20, Gold: 10, Silver: 120}}
 	}
 	character.ChooseLocation()
 }
