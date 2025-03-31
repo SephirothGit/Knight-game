@@ -24,7 +24,7 @@ git checkout -b feature/your-feature
 git push origin feature/your-feature
 4.Create a pull request.
 
-### 8. **Authors**
+### **Authors**
 Specify who worked on the project.
 ```markdown
 ## Authors
