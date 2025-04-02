@@ -1,7 +1,14 @@
 # Knights journey
 
 ## Description
-This is a text RPG game, here is the story of this world: 
+This is a text RPG game in which you can:
+
+• Create unique character (Knight, Paladin, Mage or Priest)
+• Explore taverns, dungeons and dangerous forests
+• Fight monsters in turn based battles
+• Make different choices and choose different dialog actions
+
+Here is the story of this world: 
 
 In the center of the continent lies the city of Faun, surrounded by the Forbidden forest, where dangerous creatures live.
 Under the city are hidden ancient elven dungeons that keeping forgotten secrets and treasures.
