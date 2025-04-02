@@ -1,7 +1,10 @@
 # Knights journey
 
 ## Description
-This game is a text RPG that was written on Go.
+This is a text RPG game, here is the story of this world: 
+
+In the center of the continent lies the city of Faun, surrounded by the Forbidden forest, where dangerous creatures live.
+Under the city are hidden ancient elven dungeons that keeping forgotten secrets and treasures.
 
 ## Installation
 1. Make sure you have Go installed.
